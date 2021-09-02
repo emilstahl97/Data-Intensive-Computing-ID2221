@@ -3,8 +3,9 @@ import scala.collection.mutable.ArrayBuffer
 object ScalaTut {
   def main(args: Array[String]) : Unit = {
 
-      var stack = new myStack()
+     var stack = new myStack() // create a new stack
 
+      def callStack() : Unit = {
       stack.push(1)
       stack.push(2)
       stack.push(3)
@@ -19,6 +20,9 @@ object ScalaTut {
       println("Is element 4 in the stack?  " + stack.search(4))
 
       println("Is stack empty? " + stack.isEmpty())
+      }
+
+      callStack()
  }
 }
 
