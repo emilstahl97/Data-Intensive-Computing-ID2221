@@ -1,2 +1,5 @@
 *.DS_Store
 Launch Meeting - Zoom.webloc
+*.db
+Labs/.vscode/settings.json
+Labs/.metals/metals.log
