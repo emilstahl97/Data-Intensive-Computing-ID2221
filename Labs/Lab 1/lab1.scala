@@ -1,3 +1,6 @@
+/* 
+Task 1
+ */
 val pagecounts = sc.textFile("/FileStore/tables/pagecounts_20160101_000000_parsed-1.out")
 
 // *1. Create a case class called Log using the four field names of the dataset.
@@ -99,3 +102,19 @@ println("Total number of unique terms is " + pageTermsSorted.count())
 val mostFrequentTerm = pageTermsSorted.take(1)
 print("The most frequent term is ")
 println(mostFrequentTerm.foreach(print))
+
+/*
+Task 2
+*/
+val pageCountsDataFrame = spark.createDataFrame(pageCountsCollection)
+
+// pageCountsDataFrame.show()
+import org.apache.spark.sql.functions._
+
+// 3. Compute the min, max, and average page size.
+pageCountsDataFrame.select(max("pageSize"), min("pageSize"), avg("pageSize")).show()
+
+// 5. Determine the record with the largest page size again. But now, pick the most popular.
+pageCountsDataFrame.sort(col("pageSize").desc,col("numberOfRequests").desc).show(1)
+
+// 7. Use the results of Question 3, and create a new RDD with the records that have greater page size than the average.
