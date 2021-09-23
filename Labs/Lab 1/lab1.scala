@@ -1,4 +1,3 @@
-%scala
 val pagecounts = sc.textFile("/FileStore/tables/pagecounts_20160101_000000_parsed-1.out")
 
 // *1. Create a case class called Log using the four field names of the dataset.
@@ -83,7 +82,6 @@ println("Pages with single view in percentage " + pagesWithSingleViewPercentage 
 
 
 // 12. Determine the number of unique terms appearing in the page titles. Note that in page titles, terms are delimited by "_" instead of a white space. You can use any number of normalization steps (e.g., lowercasing, removal of non-alphanumeric characters).
-
 // Get page terms from titles by chaning to lowercase and replace non-alpahnumeric characters with _
 val pageTerms = pageCountsCollection.map(page => page.field2.toLowerCase().replaceAll("[^a-zA-Z0-9]", "_"))
 // Split by _
@@ -95,6 +93,8 @@ val pageTermsCount = pageTermsRemoveEmptyString.map(word => (word,1)).reduceByKe
 // Sort the terms by count and sort descending
 val pageTermsSorted = pageTermsCount.sortBy(_._2, false) 
 println("Total number of unique terms is " + pageTermsSorted.count())
+
+
 // 13. Determine the most frequently occurring page title term in this dataset.
 val mostFrequentTerm = pageTermsSorted.take(1)
 print("The most frequent term is ")
