@@ -57,7 +57,6 @@ val pagesWithAboveAverageSizeRDD = sc.parallelize(Seq(pagesWithAboveAverageSizeC
 
 // 8. Compute the total number of pageviews for each project (as the schema shows, the first field of each record contains the project code).
 val projectViewCollection = pageCountsCollection.map(page => (page.projectName, page.numberOfRequests.toInt))
-// projectViewCollection.take(15).foreach(println)
 val projectTotalViews = projectViewCollection.reduceByKey((x,y)=>x+y)
 
 // 9. Report the 10 most popular pageviews of all projects, sorted by the total number of hits.
@@ -118,3 +117,44 @@ pageCountsDataFrame.select(max("pageSize"), min("pageSize"), avg("pageSize")).sh
 pageCountsDataFrame.sort(col("pageSize").desc,col("numberOfRequests").desc).show(1)
 
 // 7. Use the results of Question 3, and create a new RDD with the records that have greater page size than the average.
+val avgPageSize = pageCountsDataFrame.select(avg($"pageSize")).take(1)(0)(0)
+
+val pageSizeGreaterThanAvgRDD = pageCountsDataFrame.filter($"pagesize" > avgPageSize).rdd
+
+pageSizeGreaterThanAvgRDD.take(15).foreach(println)
+
+
+/* 
+  12.  Determine the number of unique terms appearing 
+        in the page titles. Note that in page titles, terms
+        are delimited by \ " instead of a white space. 
+        You can use any number of normalization steps (e.g.,
+        lowercasing, removal of non-alphanumeric characters).
+*/
+
+val pageCountsDataFrameToLower = pageCountsDataFrame.withColumn("pageTitle", lower(col("pageTitle")))
+
+def replaceNonAlphaNumeric: String => String = _.replaceAll("[^a-zA-Z0-9 ]", "_")
+
+val replaceNonAlphaNumericUDF = udf(replaceNonAlphaNumeric)
+
+val pageCountsDataFrameNormalised = pageCountsDataFrameToLower.withColumn("pageTitle", replaceNonAlphaNumericUDF($"pageTitle"))
+
+val wordsToRow = pageCountsDataFrameNormalised.withColumn("pageTitle", explode(split($"pageTitle", "\\_")))
+
+val pageTitleWordCount = (wordsToRow.groupBy("pageTitle").count())
+val pageTitleWordCountSorted = pageTitleWordCount.sort(col("count").desc)
+val emptyStringRow = pageTitleWordCountSorted.first() 
+
+val uniqueTermsAppearingInThePageTitles = pageTitleWordCountSorted.filter(row => row != emptyStringRow)
+
+uniqueTermsAppearingInThePageTitles.show()
+val totalNumberOfUniqueTerms = uniqueTermsAppearingInThePageTitles.count
+println("The total number of unique terms in page titles is " + totalNumberOfUniqueTerms)
+
+
+/* 
+  13. Determine the most frequently occurring page title term in this dataset. 
+*/
+val mostFrequentPageTitlesDF = uniqueTermsAppearingInThePageTitles.take(1)(0)(0)
+println("The most frequent term in page titles is " + mostFrequentPageTitlesDF)
