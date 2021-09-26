@@ -1,6 +1,12 @@
 /* 
+Lab 1 
+Data-intensive computing
+Emil Ståhl
+Selemawit Fsha
+Date: 2021-09-26
 Task 1
  */
+
 val pagecounts = sc.textFile("/FileStore/tables/pagecounts_20160101_000000_parsed-1.out")
 
 // *1. Create a case class called Log using the four field names of the dataset.
