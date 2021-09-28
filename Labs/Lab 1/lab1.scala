@@ -1,3 +1,4 @@
+import org.apache.spark.sql.functions._
 /* 
 Lab 1 
 Data-intensive computing
@@ -25,25 +26,29 @@ println("Total number of records in the dataset is " + totalNumbeOfRecords)
 
 // 3. Compute the min, max, and average page size.
 val maxPages = pageCountsCollection.reduce((acc,value) => { 
-  if(acc.pageSize < value.pageSize) value else acc})
+  if(acc.pageSize.toLong < value.pageSize.toLong) value else acc})
 println("The maximum page size is " + maxPages.pageSize)
 
 val minPages = pageCountsCollection.reduce((acc,value) => { 
-  if(acc.pageSize > value.pageSize) value else acc})
+  if(acc.pageSize.toLong > value.pageSize.toLong) value else acc})
 println("The minimum page size is " + minPages.pageSize)
 
-val average = pageCountsCollection.map(_.pageSize.toLong).sum/totalNumbeOfRecords.toLong
+val average = pageCountsCollection.map(_.pageSize.toLong).sum / totalNumbeOfRecords.toLong
 println("The average page size is " + average)
 
 // 4. Determine the record(s) with the largest page size. If multiple records have the same size, list all of them.
 val largePageSize = pageCountsCollection.filter(page => page.pageSize == maxPages.pageSize)
 println("List of records with largest page size: ")
 largePageSize.collect.foreach(println)
+//println("Total largest page size: " + largePageSize.count())
 
 // 5. Determine the record with the largest page size again. But now, pick the most popular.
 val largePageSizeAndPopular = largePageSize.reduce((acc,value) => { 
   if(acc.numberOfRequests < value.numberOfRequests) value else acc})
-println("Records with largest page size and that are the most popular " + largePageSizeAndPopular)
+val largePageSizeAndPopularTotal = largePageSize.filter(page => page.numberOfRequests == largePageSizeAndPopular.numberOfRequests)
+println("Records with largest page size and that are the most popular ")
+largePageSizeAndPopularTotal.collect.foreach(println)
+
 
 // 6. Determine the record(s) with the largest page title. If multiple titles have the same length, list all of them.
 val maxTitleLength = pageCountsCollection.reduce((acc,value) => { 
@@ -55,11 +60,14 @@ println("List of records with longest page title: ")
 largePageTitle.collect.foreach(println)
 
 //7. Use the results of Question 3, and create a new RDD with the records that have greater page size than the average.
-val pagesWithAboveAverageSizeCollection = pageCountsCollection.filter(page => page.pageSize.toLong > average.toLong)
-// pagesWithAboveAverageSizeCollection.collect.foreach(println)
+val pagesWithAboveAverageSizeCollection = 
+pageCountsCollection.filter(page => page.pageSize.toLong > average.toLong)
+println("Records with greater page size than average: " + pagesWithAboveAverageSizeCollection.count() )
+///pagesWithAboveAverageSizeCollection.collect.foreach(println)
 
 val pagesWithAboveAverageSizeRDD = sc.parallelize(Seq(pagesWithAboveAverageSizeCollection))
-// pagesWithAboveAverageSizeRDD.collect.foreach(println)
+//pagesWithAboveAverageSizeRDD.collect.foreach(println)
+
 
 // 8. Compute the total number of pageviews for each project (as the schema shows, the first field of each record contains the project code).
 val projectViewCollection = pageCountsCollection.map(page => (page.projectName, page.numberOfRequests.toInt))
@@ -70,11 +78,11 @@ val projectTotalViewsSorted = projectTotalViews.sortBy(_._2, false)
 println("Top ten popular pages with high total views: ")
 projectTotalViewsSorted.take(10).foreach(println)
 
+
 // 10. Determine the number of page titles that start with the article "The". How many of those page titles are not part of the English project (Pages that are part of the English project have "en" as the first field)?
-var pagesThatStartWithThe = pageCountsCollection.filter(page => page.pageTitle.startsWith("The"))
-// var pagesThatStartWithTheCount = pagesThatStartWithThe.count()
-// pagesThatStartWithThe.take(3).foreach(println)
-// println(pagesThatStartWithThe)
+var pagesThatStartWithThe = pageCountsCollection.filter(page => page.pageTitle.startsWith("The")) 
+//var pagesThatStartWithTheCount = pagesThatStartWithThe.count()
+//pagesThatStartWithThe.take(3).foreach(println)
 println("The total number of pages that start with 'The' are " + pagesThatStartWithThe.count())
 
 var nonEnglishPagesThatStartWithThe = pagesThatStartWithThe.filter(page => !page.projectName.equals("en"))
@@ -90,7 +98,7 @@ println("Pages with single view in percentage " + pagesWithSingleViewPercentage 
 
 
 // 12. Determine the number of unique terms appearing in the page titles. Note that in page titles, terms are delimited by "_" instead of a white space. You can use any number of normalization steps (e.g., lowercasing, removal of non-alphanumeric characters).
-// Get page terms from titles by chaning to lowercase and replace non-alpahnumeric characters with _
+// Get page terms from titles by changing to lowercase and replace non-alpahnumeric characters with _
 val pageTerms = pageCountsCollection.map(page => page.pageTitle.toLowerCase().replaceAll("[^a-zA-Z0-9]", "_"))
 // Split by _
 val pageTermsSplitted = pageTerms.flatMap(l => l.split("_"))
@@ -105,24 +113,24 @@ println("Total number of unique terms is " + pageTermsSorted.count())
 
 // 13. Determine the most frequently occurring page title term in this dataset.
 val mostFrequentTerm = pageTermsSorted.take(1)
-print("The most frequent term is ")
-println(mostFrequentTerm.foreach(print))
+println("The most frequent term is ")
+println(mostFrequentTerm.foreach(println))
 
 /*
 Task 2
 */
 val pageCountsDataFrame = spark.createDataFrame(pageCountsCollection)
 
-// pageCountsDataFrame.show()
-import org.apache.spark.sql.functions._
-
 // 3. Compute the min, max, and average page size.
-pageCountsDataFrame.select(max("pageSize"), min("pageSize"), avg("pageSize")).show()
+pageCountsDataFrame.select(max(col("pageSize").cast("BIGINT"))).show()
+pageCountsDataFrame.select(min(col("pageSize").cast("BIGINT"))).show()
+pageCountsDataFrame.select(avg(col("pageSize").cast("BIGINT"))).show()
 
 // 5. Determine the record with the largest page size again. But now, pick the most popular.
-pageCountsDataFrame.sort(col("pageSize").desc,col("numberOfRequests").desc).show(1)
+ pageCountsDataFrame.sort(col("pageSize").cast("BIGINT").desc,col("numberOfRequests").cast("BIGINT").desc).show(1)
 
 // 7. Use the results of Question 3, and create a new RDD with the records that have greater page size than the average.
+
 val avgPageSize = pageCountsDataFrame.select(avg($"pageSize")).take(1)(0)(0)
 
 val pageSizeGreaterThanAvgRDD = pageCountsDataFrame.filter($"pagesize" > avgPageSize).rdd
@@ -130,14 +138,12 @@ val pageSizeGreaterThanAvgRDD = pageCountsDataFrame.filter($"pagesize" > avgPage
 pageSizeGreaterThanAvgRDD.take(15).foreach(println)
 
 
-/* 
-  12.  Determine the number of unique terms appearing 
-        in the page titles. Note that in page titles, terms
-        are delimited by \ " instead of a white space. 
-        You can use any number of normalization steps (e.g.,
-        lowercasing, removal of non-alphanumeric characters).
-*/
+/*12. Determine the number of unique terms appearing in the page titles. Note that in page titles, terms
+are delimited by \ " instead of a white space. You can use any number of normalization steps (e.g.,
+lowercasing, removal of non-alphanumeric characters).*/
 
+
+//val pageTitle = "pageTitle"
 val pageCountsDataFrameToLower = pageCountsDataFrame.withColumn("pageTitle", lower(col("pageTitle")))
 
 def replaceNonAlphaNumeric: String => String = _.replaceAll("[^a-zA-Z0-9 ]", "_")
@@ -154,13 +160,11 @@ val emptyStringRow = pageTitleWordCountSorted.first()
 
 val uniqueTermsAppearingInThePageTitles = pageTitleWordCountSorted.filter(row => row != emptyStringRow)
 
-uniqueTermsAppearingInThePageTitles.show()
+// uniqueTermsAppearingInThePageTitles.show()
 val totalNumberOfUniqueTerms = uniqueTermsAppearingInThePageTitles.count
 println("The total number of unique terms in page titles is " + totalNumberOfUniqueTerms)
 
 
-/* 
-  13. Determine the most frequently occurring page title term in this dataset. 
-*/
+//13. Determine the most frequently occurring page title term in this dataset.
 val mostFrequentPageTitlesDF = uniqueTermsAppearingInThePageTitles.take(1)(0)(0)
 println("The most frequent term in page titles is " + mostFrequentPageTitlesDF)
