@@ -16,18 +16,35 @@ import scala.util.Random
 object KafkaSpark {
   def main(args: Array[String]) {
     // make a connection to Kafka and read (key, value) pairs from it
-    <FILL IN>
-    val kafkaConf = <FILL IN>
-    val messages = KafkaUtils.createDirectStream.<FILL IN>
-    <FILL IN>
+
+    val kafkaConf = Map(
+      "metadata.broker.list" -> "localhost:9092",
+      "zookeeper.connect" -> "localhost:2181",
+      "group.id" -> "spark-streaming-consumer",
+      "zookeeper.connection.timeout.ms" -> "1000")
+      
+    //val sc = spark.sparkContext
+    val ssc = new StreamingContext(sc, Seconds(1))
+    
+    // Create direct kafka stream with brokers and topics
+    val topics = Set("avg")
+    val kafkaParams = Map[String, String]("metadata.broker.list" -> "localhost:9092")
+    val kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaConf, topics)
+
+    // print words
+    kafkaStream.foreachRDD(rdd => {
+      val words = rdd.map(_._2)
+      words.foreach(println)
+    })
 
     // measure the average value for each key in a stateful manner
+    /*
     def mappingFunc(key: String, value: Option[Double], state: State[Double]): (String, Double) = {
-	<FILL IN>
     }
     val stateDstream = pairs.mapWithState(<FILL IN>)
 
     ssc.start()
     ssc.awaitTermination()
+    */
   }
 }
