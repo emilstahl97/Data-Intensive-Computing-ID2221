@@ -8,3 +8,7 @@ Labs/Lab 1/Assignment/pagecounts-20160101-000000_parsed.out
 Labs/Lab 1/.vscode/settings.json
 Labs/Lab 1/.metals/metals.log
 *.out
+*.class
+*.cache
+*.log
+Labs/Lab 2/src/generator/target/scala-2.13/zinc/inc_compile_2.13.zip
