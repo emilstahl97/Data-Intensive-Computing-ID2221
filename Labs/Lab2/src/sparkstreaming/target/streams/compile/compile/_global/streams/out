@@ -1,4 +1,2 @@
-[0m[[0m[31merror[0m] [0m[0m/Users/emilstahl/Documents/GitHub/Data-Intensive-Computing-ID2221/Labs/Lab 2/src/sparkstreaming/KafkaSpark.scala:27:36: not found: value sc[0m
-[0m[[0m[31merror[0m] [0m[0m    val ssc = new StreamingContext(sc, Seconds(1))[0m
-[0m[[0m[31merror[0m] [0m[0m                                   ^[0m
-[0m[[0m[31merror[0m] [0m[0mone error found[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere was one deprecation warning; re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mone warning found[0m

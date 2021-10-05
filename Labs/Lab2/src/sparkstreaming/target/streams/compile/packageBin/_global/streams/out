@@ -1,0 +1,15 @@
+[0m[[0m[0mdebug[0m] [0m[0mPackaging /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Labs/Lab2/src/sparkstreaming/target/scala-2.11/spark_kafka_2.11-1.0.jar ...[0m
+[0m[[0m[0mdebug[0m] [0m[0mInput file mappings:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	sparkstreaming[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Labs/Lab2/src/sparkstreaming/target/scala-2.11/classes/sparkstreaming[0m
+[0m[[0m[0mdebug[0m] [0m[0m	sparkstreaming/KafkaSpark$$anonfun$main$1$$anonfun$apply$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Labs/Lab2/src/sparkstreaming/target/scala-2.11/classes/sparkstreaming/KafkaSpark$$anonfun$main$1$$anonfun$apply$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	sparkstreaming/KafkaSpark.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Labs/Lab2/src/sparkstreaming/target/scala-2.11/classes/sparkstreaming/KafkaSpark.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	sparkstreaming/KafkaSpark$$anonfun$main$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Labs/Lab2/src/sparkstreaming/target/scala-2.11/classes/sparkstreaming/KafkaSpark$$anonfun$main$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	sparkstreaming/KafkaSpark$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Labs/Lab2/src/sparkstreaming/target/scala-2.11/classes/sparkstreaming/KafkaSpark$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	sparkstreaming/KafkaSpark$$anonfun$main$1$$anonfun$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Labs/Lab2/src/sparkstreaming/target/scala-2.11/classes/sparkstreaming/KafkaSpark$$anonfun$main$1$$anonfun$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0mDone packaging.[0m
