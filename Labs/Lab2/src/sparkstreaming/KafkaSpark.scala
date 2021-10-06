@@ -29,7 +29,7 @@ object KafkaSpark {
     // Added checkpoint t solve the error
     // https://stackoverflow.com/questions/32411252/spark-invalid-checkpoint-directory
     // But doesn't seem to solve it :-/
-    // ssc.checkpoint("hdfs://master:9000/RddCheckPoint")
+    ssc.checkpoint("./checkpoints")
 
     //create spark session
     val spark = SparkSession.builder.appName("KafkaSpark").getOrCreate()
