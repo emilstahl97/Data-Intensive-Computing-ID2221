@@ -20,7 +20,7 @@ object KafkaSpark {
   def main(args: Array[String]) {
     val conf = new SparkConf().setMaster("local[2]").setAppName("KafkaSpark") // local[2] = deploy locally, need 2 threads to read and process data
     val ssc = new StreamingContext(conf, Seconds(10)) // Window of 1 sec (not needed for direct stream??)
-    ssc.checkpoint(".")
+    ssc.checkpoint("./checkpoints")
     val kafkaConf = Map(
       "metadata.broker.list" -> "localhost:9092",
       "zookeeper.connect" -> "localhost:2181",
