@@ -46,6 +46,7 @@ object KafkaSpark {
         lines.foreach(println)
       }
     })
+    
 
     val value = kafkaStream.map{case (key, value) => value.split(',')}
     val pairs = value.map(record => (record(1), record(2).toDouble))
