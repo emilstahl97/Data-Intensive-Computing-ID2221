@@ -26,6 +26,8 @@ object KafkaSpark {
     val sc = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(1))
 
+    ssc.checkpoint("./checkpoints")
+
     //create spark session
 
     val spark = SparkSession.builder.appName("KafkaSpark").getOrCreate()
@@ -44,6 +46,9 @@ object KafkaSpark {
         lines.foreach(println)
       }
     })
+
+    val value = kafkaStream.map{case (key, value) => value.split(',')}
+    val pairs = value.map(record => (record(1), record(2).toDouble))
 
     ssc.start()
     ssc.awaitTermination()
