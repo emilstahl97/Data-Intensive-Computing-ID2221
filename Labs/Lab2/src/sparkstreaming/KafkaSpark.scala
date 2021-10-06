@@ -18,36 +18,24 @@ import org.apache.spark.sql.SparkSession
 
 object KafkaSpark {
   def main(args: Array[String]) {
+    val conf = new SparkConf().setMaster("local[2]").setAppName("KafkaSpark") // local[2] = deploy locally, need 2 threads to read and process data
+    val ssc = new StreamingContext(conf, Seconds(10)) // Window of 1 sec (not needed for direct stream??)
+    ssc.checkpoint(".")
+    val kafkaConf = Map(
+      "metadata.broker.list" -> "localhost:9092",
+      "zookeeper.connect" -> "localhost:2181",
+      "group.id" -> "kafka-spark-streaming",
+      "zookeeper.connection.timeout.ms" -> "1000")
+    val topics = Set("avg")
     // make a connection to Kafka and read (key, value) pairs from it
-    
+    val kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
+      ssc, kafkaConf, topics
+    )
 
-    //create a spark context
-    val conf = new SparkConf().setAppName("KafkaSpark").setMaster("local[2]")
-    val sc = new SparkContext(conf)
-    val ssc = new StreamingContext(sc, Seconds(1))
-
-    ssc.checkpoint("./checkpoints")
-
-    //create spark session
-
-    val spark = SparkSession.builder.appName("KafkaSpark").getOrCreate()
-
-    // Create direct kafka stream with brokers and topics
-    val topicsSet = Set("avg")
-    val kafkaParams = Map[String, String]("metadata.broker.list" -> "localhost:9092")
-    val kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParams, topicsSet)
-    
-
-    val value = kafkaStream.map{case (key, value) => value.split(',')}
-    val pairs = value.map(record => (record(1), record(2).toDouble))
-
-    // print out value and pairs
+    // Extract (key, value) pairs
+    val values = kafkaStream.map(x => x._2.split(","))
+    val pairs = values.map(x => (x(0), x(1).toDouble))
     pairs.print()
-    value.print()
-
-    // compute average
-    
-
 
     ssc.start()
     ssc.awaitTermination()
