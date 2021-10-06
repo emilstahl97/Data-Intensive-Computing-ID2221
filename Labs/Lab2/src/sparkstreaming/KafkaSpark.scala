@@ -26,11 +26,13 @@ object KafkaSpark {
     val sc = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(1))
 
+    // Added checkpoint t solve the error
+    // https://stackoverflow.com/questions/32411252/spark-invalid-checkpoint-directory
+    // But doesn't seem to solve it :-/
+    // ssc.checkpoint("hdfs://master:9000/RddCheckPoint")
+
     //create spark session
-
     val spark = SparkSession.builder.appName("KafkaSpark").getOrCreate()
-
-
 
     // Create direct kafka stream with brokers and topics
     val topicsSet = Set("avg")
@@ -38,26 +40,29 @@ object KafkaSpark {
     val kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParams, topicsSet)
 
     // print kafka stream to terminal 
-    kafkaStream.foreachRDD(rdd => {
+/*     kafkaStream.foreachRDD(rdd => {
       if (!rdd.isEmpty()) {
         val lines = rdd.map(_._2)
         lines.foreach(println)
       }
-    })
+    }) */
 
-    ssc.start()
-    ssc.awaitTermination()
-
-
-/*
+    val value = kafkaStream.map{case (key, value) => value.split(',')}
+    val pairs = value.map(record => (record(1), record(2).toDouble))
+    
     // measure the average value for each key in a stateful manner
-    def mappingFunc(key: String, value: Option[Double], state: State[Double]): (String, Double) = {
-	<FILL IN>
+    def mappingFunc(key: String, value: Option[Double], state: State[(Double, Int)]): (String, Double) = {
+      val (sum, count) = state.getOption.getOrElse((0.0, 0))
+      val updatedSum = value.getOrElse(0.0) + sum
+      val updatedCount = count + 1
+      state.update((updatedSum, updatedCount))
+      (key, updatedSum/updatedCount)
     }
-    val stateDstream = pairs.mapWithState(<FILL IN>)
+
+    val stateDstream = pairs.mapWithState(StateSpec.function(mappingFunc _))
+    stateDstream.print()
 
     ssc.start()
     ssc.awaitTermination()
-  */
   }
 }
