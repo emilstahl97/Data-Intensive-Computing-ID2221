@@ -51,9 +51,6 @@ object KafkaSpark {
     val value = kafkaStream.map{case (key, value) => value.split(',')}
     val pairs = value.map(record => (record(1), record(2).toDouble))
 
-    ssc.start()
-    ssc.awaitTermination()
-
     // calculate the average value for each key in a stateful manner with mapWithState
     def mappingFunc(key: String, value: Option[Double], state: State[Double]): (String, Double) = {
       val sum = value.getOrElse(0.0) + state.getOption.getOrElse(0.0)
