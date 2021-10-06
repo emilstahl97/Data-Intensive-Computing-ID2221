@@ -54,16 +54,22 @@ object KafkaSpark {
     ssc.start()
     ssc.awaitTermination()
 
-
-/*
-    // measure the average value for each key in a stateful manner
+    // calculate the average value for each key in a stateful manner with mapWithState
     def mappingFunc(key: String, value: Option[Double], state: State[Double]): (String, Double) = {
-	<FILL IN>
+      val sum = value.getOrElse(0.0) + state.getOption.getOrElse(0.0)
+      val avg = sum / 2
+      state.update(avg)
+      (key, avg)
     }
-    val stateDstream = pairs.mapWithState(<FILL IN>)
+
+    // call mappingFunc with pairs and mapwithstate
+    val stateDstream = pairs.mapWithState(StateSpec.function(mappingFunc _))
+
+    // print the stateDstream to terminal
+    stateDstream.print()
+
 
     ssc.start()
     ssc.awaitTermination()
-  */
   }
 }
