@@ -1,1 +1,11 @@
-[0m[[0m[0mdebug[0m] [0m[0mJar uptodate: /Users/emilstahl/Documents/GitHub/Data-Intensive-Computing-ID2221/Labs/Lab 2/src/generator/target/scala-2.13/producer_2.13-1.0.jar[0m
+[0m[[0m[0mdebug[0m] [0m[0mPackaging /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Labs/Lab2/src/generator/target/scala-2.13/producer_2.13-1.0.jar ...[0m
+[0m[[0m[0mdebug[0m] [0m[0mInput file mappings:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	generator[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Labs/Lab2/src/generator/target/scala-2.13/classes/generator[0m
+[0m[[0m[0mdebug[0m] [0m[0m	generator/ScalaProducerExample.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Labs/Lab2/src/generator/target/scala-2.13/classes/generator/ScalaProducerExample.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	generator/ScalaProducerExample$delayedInit$body.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Labs/Lab2/src/generator/target/scala-2.13/classes/generator/ScalaProducerExample$delayedInit$body.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	generator/ScalaProducerExample$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Labs/Lab2/src/generator/target/scala-2.13/classes/generator/ScalaProducerExample$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0mDone packaging.[0m
