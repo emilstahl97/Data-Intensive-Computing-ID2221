@@ -26,26 +26,26 @@ object KafkaSpark {
 
     val topics = Set("avg")
   
-    // Read data from Kafka into Spark Streaming
-    val initDf = spark
-      .readStream
-      .format("kafka")
-      .option("kafka.bootstrap.servers", "localhost:9092")
-      .option("subscribe", "avg")
-      .load()
-      .select(col("value").cast("string"))
+   // read from kafka with spark structured streaming
+    val kafkaParams = Map[String, String]("metadata.broker.list" -> "localhost:9092")
+    val messages = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
+      ssc, kafkaParams, topics)
+      
+    // calculate average value of key with spark structured streaming
+    val avg = messages.map(x => x._2.toInt).reduce(_+_)
+    avg.foreachRDD(rdd => {
+      val avg = rdd.reduce(_+_) / rdd.count()
+      println(s"Average value of key is $avg")
+    })
+
+    // calculate average value of key with spark sql
+    val df = spark.read.json(messages.map(x => x._2))
+    df.createOrReplaceTempView("avg")
+    val avg2 = spark.sql("select avg(value) from avg")
+    avg2.show()
 
     
-    // calculate average for each value with spark streaming
-    val avgDf = initDf.groupBy("value").count().withColumn("avg", initDf("count")/initDf("value"))
 
-    // write average to terminal
-    val query = avgDf.writeStream
-      .outputMode("complete")
-      .format("console")
-      .start()
-      
-          
 
     ssc.start()
     ssc.awaitTermination()
