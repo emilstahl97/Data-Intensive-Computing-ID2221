@@ -19,7 +19,7 @@ object KafkaSpark {
     // make a connection to Kafka and read (key, value) pairs from it
     val sparkConf = new SparkConf().setMaster("local[2]").setAppName("KafkaSpark")
     val ssc = new StreamingContext(sparkConf, Seconds(10))
-    ssc.checkpoint("/home/cuong/projects/id2221-labs/temp")
+    ssc.checkpoint("./checkpoints")
 
     val spark = SparkSession.builder.appName("KafkaSpark").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
