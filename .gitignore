@@ -12,3 +12,19 @@ Labs/Lab 1/.metals/metals.log
 *.cache
 *.log
 Labs/Lab 2/src/generator/target/scala-2.13/zinc/inc_compile_2.13.zip
+/Users/emilstahl/Documents/GitHub/Data-Intensive-Computing-ID2221/Labs/Lab2/src/sparkstreaming/target/
+/Users/emilstahl/Documents/GitHub/Data-Intensive-Computing-ID2221/Labs/Lab2/src/sparkstreaming/project/
+/Users/emilstahl/Documents/GitHub/Data-Intensive-Computing-ID2221/Labs/Lab2/src/sparkstreaming/checkpoints/
+/Users/emilstahl/Documents/GitHub/Data-Intensive-Computing-ID2221/Labs/Lab2/src/sparkstreaming/.bsp/
+/Users/emilstahl/Documents/GitHub/Data-Intensive-Computing-ID2221/Labs/Lab2/src/sparkstreaming/receivedBlockMetadata/
+/Users/emilstahl/Documents/GitHub/Data-Intensive-Computing-ID2221/Labs/Lab2/src/.metals/
+/Users/emilstahl/Documents/GitHub/Data-Intensive-Computing-ID2221/Labs/Lab2/src/.vscode/
+
+/Users/emilstahl/Documents/GitHub/Data-Intensive-Computing-ID2221/Labs/Lab2/src/generator/.bsp
+/Users/emilstahl/Documents/GitHub/Data-Intensive-Computing-ID2221/Labs/Lab2/src/generator/project 
+/Users/emilstahl/Documents/GitHub/Data-Intensive-Computing-ID2221/Labs/Lab2/src/generator/target
+*.crc
+*.crc
+Labs/Lab2/src/sparkstreaming/target/bg-jobs/sbt_30c8d119/target/1e84684a/c7a5df02/jersey-guava-2.22.2.jar
+*.jar
+*.bk
