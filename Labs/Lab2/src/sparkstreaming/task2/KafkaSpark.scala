@@ -24,33 +24,28 @@ object KafkaSpark {
     val spark = SparkSession.builder.appName("KafkaSpark").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
 
-    val kafkaConf = Map(
-      "metadata.broker.list" -> "localhost:9092",
-      "zookeeper.connect" -> "localhost:2181",
-      "group.id" -> "kafka-spark-streaming",
-      "zookeeper.connection.timeout.ms" -> "1000"
-    )
     val topics = Set("avg")
   
-    val messages = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
-      ssc, kafkaConf, topics
-    )
-    val values = messages.map(x => x._2.split(","))
-    val pairs = values.map(x => (x(0), x(1).toDouble))
-    pairs.print()
+    // Read data from Kafka into Spark Streaming
+    val initDf = spark
+      .readStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", "localhost:9092")
+      .option("subscribe", "avg")
+      .load()
+      .select(col("value").cast("string"))
 
-    // measure the average value for each key in a stateful manner
-    def mappingFunc(key: String, value: Option[Double], state: State[Double]): (String, Double) = {
-      val sum = value.getOrElse(0.0) + state.getOption().getOrElse(0.0)
-      val avg = sum / 2
-      state.update(avg)
-      (key, avg)
-    }
-    val stateDstream = pairs.mapWithState(StateSpec.function(mappingFunc _))
-    stateDstream.foreachRDD(rdd => {
-      val values = rdd.map(x => x).collect()
-      values.foreach(println)
-    })
+    
+    // calculate average for each value with spark streaming
+    val avgDf = initDf.groupBy("value").count().withColumn("avg", initDf("count")/initDf("value"))
+
+    // write average to terminal
+    val query = avgDf.writeStream
+      .outputMode("complete")
+      .format("console")
+      .start()
+      
+          
 
     ssc.start()
     ssc.awaitTermination()
