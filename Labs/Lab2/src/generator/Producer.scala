@@ -30,6 +30,7 @@ object ScalaProducerExample extends App {
     while (true) {
         val data = new ProducerRecord[String, String](topic, null, getRandomVal)
         producer.send(data)
+        Thread.sleep(5000)
         print(data + "\n")
     }
 

@@ -1,2 +1,2 @@
-[0m[[0m[0mdebug[0m] [0m[0mCreated transactional ClassFileManager with tempDir = /Users/emilstahl/Documents/GitHub/Data-Intensive-Computing-ID2221/Labs/Lab 2/src/generator/project/target/scala-2.12/sbt-1.0/classes.bak[0m
-[0m[[0m[0mdebug[0m] [0m[0mRemoving the temporary directory used for backing up class files: /Users/emilstahl/Documents/GitHub/Data-Intensive-Computing-ID2221/Labs/Lab 2/src/generator/project/target/scala-2.12/sbt-1.0/classes.bak[0m
+[0m[[0m[0mdebug[0m] [0m[0mCreated transactional ClassFileManager with tempDir = /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Labs/Lab2/src/generator/project/target/scala-2.12/sbt-1.0/classes.bak[0m
+[0m[[0m[0mdebug[0m] [0m[0mRemoving the temporary directory used for backing up class files: /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Labs/Lab2/src/generator/project/target/scala-2.12/sbt-1.0/classes.bak[0m

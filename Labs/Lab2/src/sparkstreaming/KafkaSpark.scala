@@ -5,62 +5,52 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.streaming.kafka._
 import kafka.serializer.{DefaultDecoder, StringDecoder}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.SparkConf
-import org.apache.spark.SparkContext
 import org.apache.spark.streaming._
 import org.apache.spark.streaming.kafka._
 import org.apache.spark.storage.StorageLevel
 import java.util.{Date, Properties}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, ProducerConfig}
 import scala.util.Random
-import org.apache.spark.sql.SparkSession
-
 
 object KafkaSpark {
   def main(args: Array[String]) {
     // make a connection to Kafka and read (key, value) pairs from it
-    
-
-    //create a spark context
-    val conf = new SparkConf().setAppName("KafkaSpark").setMaster("local[2]")
-    val sc = new SparkContext(conf)
-    val ssc = new StreamingContext(sc, Seconds(1))
-
-    // Added checkpoint t solve the error
-    // https://stackoverflow.com/questions/32411252/spark-invalid-checkpoint-directory
-    // But doesn't seem to solve it :-/
+    val sparkConf = new SparkConf().setMaster("local[2]").setAppName("KafkaSpark")
+    val ssc = new StreamingContext(sparkConf, Seconds(10))
     ssc.checkpoint("./checkpoints")
 
-    //create spark session
     val spark = SparkSession.builder.appName("KafkaSpark").getOrCreate()
+    spark.sparkContext.setLogLevel("ERROR")
 
-    // Create direct kafka stream with brokers and topics
-    val topicsSet = Set("avg")
-    val kafkaParams = Map[String, String]("metadata.broker.list" -> "localhost:9092")
-    val kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParams, topicsSet)
+    val kafkaConf = Map(
+      "metadata.broker.list" -> "localhost:9092",
+      "zookeeper.connect" -> "localhost:2181",
+      "group.id" -> "kafka-spark-streaming",
+      "zookeeper.connection.timeout.ms" -> "1000"
+    )
+    val topics = Set("avg")
+  
+    val messages = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
+      ssc, kafkaConf, topics
+    )
+    val values = messages.map(x => x._2.split(","))
+    val pairs = values.map(x => (x(0), x(1).toDouble))
+    pairs.print()
 
-    // print kafka stream to terminal 
-/*     kafkaStream.foreachRDD(rdd => {
-      if (!rdd.isEmpty()) {
-        val lines = rdd.map(_._2)
-        lines.foreach(println)
-      }
-    }) */
-
-    val value = kafkaStream.map{case (key, value) => value.split(',')}
-    val pairs = value.map(record => (record(1), record(2).toDouble))
-    
     // measure the average value for each key in a stateful manner
-    def mappingFunc(key: String, value: Option[Double], state: State[(Double, Int)]): (String, Double) = {
-      val (sum, count) = state.getOption.getOrElse((0.0, 0))
-      val updatedSum = value.getOrElse(0.0) + sum
-      val updatedCount = count + 1
-      state.update((updatedSum, updatedCount))
-      (key, updatedSum/updatedCount)
+    def mappingFunc(key: String, value: Option[Double], state: State[Double]): (String, Double) = {
+      val sum = value.getOrElse(0.0) + state.getOption().getOrElse(0.0)
+      val avg = sum / 2
+      state.update(avg)
+      (key, avg)
     }
-
     val stateDstream = pairs.mapWithState(StateSpec.function(mappingFunc _))
-    stateDstream.print()
+    stateDstream.foreachRDD(rdd => {
+      val values = rdd.map(x => x).collect()
+      values.foreach(println)
+    })
 
     ssc.start()
     ssc.awaitTermination()
