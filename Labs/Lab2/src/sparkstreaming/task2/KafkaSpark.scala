@@ -33,6 +33,12 @@ object KafkaSpark {
     df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
       .as[(String, String)]
 
+    // print df to terminal
+    val query = df.writeStream
+      .format("console")
+      .outputMode("append")
+      .start()
+
     spark.close
   }
 }
