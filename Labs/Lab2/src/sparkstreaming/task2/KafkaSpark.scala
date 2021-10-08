@@ -35,10 +35,16 @@ object KafkaSpark {
     df = df.withColumn("value",col("value").cast(StringType))
 
     // select value column and split it by ,
-    val words = df.selectExpr("CAST(value AS STRING)").select(split(col("value"), ",").alias("value"))
+    val value = df.select(split(col("value"), ",").alias("value"))
 
     // print words to terminal
-    val query = words.writeStream.outputMode("append").format("console").start().awaitTermination()
+    //val query = value.writeStream.outputMode("append").format("console").start().awaitTermination()
+
+    // split query into words
+    val words = value.selectExpr("value[0] as word")
+    //print words
+    val query2 = words.writeStream.outputMode("append").format("console").start().awaitTermination()
+        
 
     // print df to terminal
     /*
