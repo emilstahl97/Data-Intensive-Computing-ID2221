@@ -41,13 +41,17 @@ object KafkaSpark {
     //val query = value.writeStream.outputMode("append").format("console").start().awaitTermination()
 
     // split query into words
-    val words = value.selectExpr("value[0] as word")
-    val number = value.selectExpr("value[1] as number")
+    //val words = value.selectExpr("value[0] as word")
+    //val number = value.selectExpr("value[1] as number")
     //print words
-    val query2 = words.writeStream.outputMode("append").format("console").start().awaitTermination()
+    //val query2 = words.writeStream.outputMode("append").format("console").start().awaitTermination()
     // print number
-    val query3 = number.writeStream.outputMode("append").format("console").start().awaitTermination()
+    //val query3 = number.writeStream.outputMode("append").format("console").start().awaitTermination()
 
+    // calculate average of words
+    val avg = value.selectExpr("value[0] as word", "value[1] as number")
+    //print avg
+    val query4 = avg.writeStream.outputMode("append").format("console").start().awaitTermination()
 
     // print df to terminal
     /*
