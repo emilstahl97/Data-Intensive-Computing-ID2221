@@ -44,7 +44,6 @@ object KafkaSpark {
     val words = value.selectExpr("value[0] as word")
     //print words
     val query2 = words.writeStream.outputMode("append").format("console").start().awaitTermination()
-        
 
     // print df to terminal
     /*
