@@ -39,6 +39,9 @@ object KafkaSpark {
       .outputMode("append")
       .start()
 
+    query.awaitTermination()
+    
+
     spark.close
   }
 }
