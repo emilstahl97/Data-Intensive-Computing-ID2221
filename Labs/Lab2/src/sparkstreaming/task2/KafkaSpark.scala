@@ -35,13 +35,11 @@ object KafkaSpark {
 
     // print df to terminal
     val query = df.writeStream
-      .format("console")
-      .outputMode("append")
-      .start()
+    .format("console")
+    .option("truncate","false")
+    .start()
+    .awaitTermination()
 
-    query.awaitTermination()
-    
-
-    spark.close
+    //spark.close
   }
 }
