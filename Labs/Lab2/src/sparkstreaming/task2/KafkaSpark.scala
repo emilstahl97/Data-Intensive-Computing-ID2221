@@ -33,6 +33,10 @@ object KafkaSpark {
     df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
       .as[(String, String)]
 
+    // convert the valuer column to string withColumn function
+    df.withColumn("value",col("value").cast("string"))
+
+
     // print df to terminal
     val query = df.writeStream
     .format("console")
