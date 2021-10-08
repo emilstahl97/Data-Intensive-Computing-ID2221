@@ -34,7 +34,6 @@ object KafkaSpark {
     // convert the valuer column to string withColumn function
     df = df.withColumn("value",col("value").cast(StringType))
 
-
     // select value column and split it by ,
     val words = df.selectExpr("CAST(value AS STRING)").select(split(col("value"), ",").alias("value"))
 
