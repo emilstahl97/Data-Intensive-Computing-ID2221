@@ -24,7 +24,7 @@ object KafkaSpark {
     val spark = SparkSession.builder.appName("KafkaSpark").config("spark.master", "local").getOrCreate()
     val sc = spark.sparkContext
 
-    val df = spark
+    var df = spark
     .readStream
     .format("kafka")
     .option("kafka.bootstrap.servers", "localhost:9092")
@@ -32,7 +32,7 @@ object KafkaSpark {
     .load()
 
     // convert the valuer column to string withColumn function
-    df.withColumn("value",col("value").cast(StringType))
+    df = df.withColumn("value",col("value").cast(StringType))
 
     // print schema
     df.printSchema()
