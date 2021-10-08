@@ -14,7 +14,8 @@ import java.util.{Date, Properties}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, ProducerConfig}
 import scala.util.Random
 import org.apache.spark.sql.functions._
-
+import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions.withColumn
 object KafkaSpark {
   def main(args: Array[String]) {
     // make a connection to Kafka and read (key, value) pairs from it
