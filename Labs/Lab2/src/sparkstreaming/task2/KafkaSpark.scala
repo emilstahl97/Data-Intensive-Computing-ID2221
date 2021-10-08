@@ -15,7 +15,7 @@ import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, Produce
 import scala.util.Random
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.col
-import org.apache.spark.sql.functions.withColumn
+
 object KafkaSpark {
   def main(args: Array[String]) {
     // make a connection to Kafka and read (key, value) pairs from it
@@ -30,12 +30,11 @@ object KafkaSpark {
     .option("subscribe", "avg")
     .load()
 
-    import spark.implicits._
-    df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
-      .as[(String, String)]
-
     // convert the valuer column to string withColumn function
-    df.withColumn("value",col("value").cast("string"))
+    df.withColumn("value",col("value").cast(StringType))
+
+    // print schema
+    df.printSchema()
 
 
     // print df to terminal
