@@ -15,6 +15,7 @@ import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, Produce
 import scala.util.Random
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerType};
 
 object KafkaSpark {
   def main(args: Array[String]) {
