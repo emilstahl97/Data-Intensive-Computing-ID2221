@@ -34,15 +34,21 @@ object KafkaSpark {
     // convert the valuer column to string withColumn function
     df = df.withColumn("value",col("value").cast(StringType))
 
-    // print schema
-    df.printSchema()
+
+    // select value column and split it by ,
+    val words = df.selectExpr("CAST(value AS STRING)").select(split(col("value"), ",").alias("value"))
+
+    // print words to terminal
+    val query = words.writeStream.outputMode("append").format("console").start().awaitTermination()
 
     // print df to terminal
+    /*
     val query = df.writeStream
     .format("console")
     .option("truncate","false")
     .start()
     .awaitTermination()
+    */
 
     //spark.close
   }
