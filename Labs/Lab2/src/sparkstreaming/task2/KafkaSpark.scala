@@ -37,7 +37,6 @@ object KafkaSpark {
     // print schema
     df.printSchema()
 
-
     // print df to terminal
     val query = df.writeStream
     .format("console")
