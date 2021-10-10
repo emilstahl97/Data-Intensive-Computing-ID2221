@@ -15,7 +15,8 @@ import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, Produce
 import scala.util.Random
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.col
-import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerType};
+import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerType, DoubleType};
+import org.apache.spark.sql.streaming.OutputMode.Complete
 
 object KafkaSpark {
   def main(args: Array[String]) {
@@ -24,44 +25,36 @@ object KafkaSpark {
     val spark = SparkSession.builder.appName("KafkaSpark").config("spark.master", "local").getOrCreate()
     val sc = spark.sparkContext
 
+    val sparkBuilder = SparkSession.builder.appName("KafkaSpark").getOrCreate()
+    sparkBuilder.sparkContext.setLogLevel("ERROR")
+
     var df = spark
-    .readStream
-    .format("kafka")
-    .option("kafka.bootstrap.servers", "localhost:9092")
-    .option("subscribe", "avg")
-    .load()
+      .readStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", "localhost:9092")
+      .option("subscribe", "avg")
+      .load()
 
     // convert the valuer column to string withColumn function
-    df = df.withColumn("value",col("value").cast(StringType))
+    df = df.withColumn("value",col("value").cast(StringType)) 
 
-    // select value column and split it by ,
-    val value = df.select(split(col("value"), ",").alias("value"))
+    // Split by , and create two columns 
+    val value = df.select(
+      split(col("value"),",").getItem(0).as("Letter"), 
+      split(col("value"),",").getItem(1).cast(DoubleType).as("Count")
+    )
 
-    // print words to terminal
-    //val query = value.writeStream.outputMode("append").format("console").start().awaitTermination()
+    val letterCountAvg = value
+      .groupBy(col("Letter")).avg("Count")
+      .toDF("Letter", "AverageCount")
 
-    // split query into words
-    //val words = value.selectExpr("value[0] as word")
-    //val number = value.selectExpr("value[1] as number")
-    //print words
-    //val query2 = words.writeStream.outputMode("append").format("console").start().awaitTermination()
-    // print number
-    //val query3 = number.writeStream.outputMode("append").format("console").start().awaitTermination()
+    val query = letterCountAvg
+      .orderBy(desc("AverageCount"))
+      .writeStream
+      .format("console")
+      .outputMode(Complete)
+      .start()
 
-    // calculate average of words
-    val avg = value.selectExpr("value[0] as word", "value[1] as number")
-    //print avg
-    val query4 = avg.writeStream.outputMode("append").format("console").start().awaitTermination()
-
-    // print df to terminal
-    /*
-    val query = df.writeStream
-    .format("console")
-    .option("truncate","false")
-    .start()
-    .awaitTermination()
-    */
-
-    //spark.close
+    query.awaitTermination()
   }
 }
