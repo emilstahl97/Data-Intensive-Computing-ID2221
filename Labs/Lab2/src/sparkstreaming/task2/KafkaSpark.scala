@@ -24,7 +24,10 @@ object KafkaSpark {
     val sparkConf = new SparkConf().setMaster("local[2]").setAppName("KafkaSpark")
     val spark = SparkSession.builder.appName("KafkaSpark").config("spark.master", "local").getOrCreate()
     val sc = spark.sparkContext
-    
+
+    val sparkBuilder = SparkSession.builder.appName("KafkaSpark").getOrCreate()
+    sparkBuilder.sparkContext.setLogLevel("ERROR")
+
     var df = spark
       .readStream
       .format("kafka")
