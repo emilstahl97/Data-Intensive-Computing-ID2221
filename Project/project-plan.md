@@ -8,13 +8,12 @@
 
 * Analyze data with spark as in lab 1
 
-(if time permits)
-* Use spark to create a time series graph of page views over time
-
 * Write the results back to kafka
 
 * Store the results in a distributed database
 
+(if time permits)
+* Use spark to create a time series graph of page views over time
 
 
 (only if part 1 is done)
