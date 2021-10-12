@@ -123,3 +123,4 @@ alias clearavg="$KAFKA_HOME/bin/kafka-topics.sh --zookeeper localhost:2181 --del
 alias createavg="$KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic avg"
 alias startkafka="$KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server.properties"
 alias print-topic="bash /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Project/src/kafka/print-topic.sh $1"
+alias delete-topic="cd && $KAFKA_HOME/bin/kafka-topics.sh --zookeeper localhost:2181 --delete --topic $1"
