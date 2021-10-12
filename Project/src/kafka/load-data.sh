@@ -27,3 +27,17 @@ bash read-into-kafka.sh 2016-jul-2 ../../Wiki-pageviews/2016/July/pagecounts-201
 bash read-into-kafka.sh 2016-aug-1 ../../Wiki-pageviews/2016/Aug/pagecounts-20160801-170000
 bash read-into-kafka.sh 2016-aug-2 ../../Wiki-pageviews/2016/Aug/pagecounts-20160802-170000
 
+# remove files
+
+
+rm ../../Wiki-pageviews/2015/July/pagecounts-20150701-170000
+rm ../../Wiki-pageviews/2015/July/pagecounts-20150702-170000
+
+rm ../../Wiki-pageviews/2015/August/pagecounts-20150801-170000
+rm ../../Wiki-pageviews/2015/August/pagecounts-20150802-170000
+
+rm ../../Wiki-pageviews/2016/July/pagecounts-20160701-170000
+rm ../../Wiki-pageviews/2016/July/pagecounts-20160702-170000
+
+rm ../../Wiki-pageviews/2016/August/pagecounts-20160801-170000
+rm ../../Wiki-pageviews/2016/August/pagecounts-20160802-170000
