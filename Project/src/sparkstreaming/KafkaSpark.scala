@@ -24,26 +24,14 @@ object KafkaSpark {
     val spark = SparkSession.builder.appName("KafkaSpark").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
 
-    val kafkaConf = Map(
-      "metadata.broker.list" -> "localhost:9092",
-      "zookeeper.connect" -> "localhost:2181",
-      "group.id" -> "kafka-spark-streaming",
-      "zookeeper.connection.timeout.ms" -> "1000"
-    )
-    val topics = Set("avg")
-  
-    val messages = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
-      ssc, kafkaConf, topics
-    )
+    val df = spark.readStream
+        .format("kafka")
+        .option("kafka.bootstrap.servers", "localhost:9092")
+        .option("subscribe", "2016-jul-1")
+        .option("startingOffsets", "earliest") // From starting
+        .load()
 
-    // print messages to terminal
-    messages.foreachRDD(rdd => {
-      if (!rdd.isEmpty()) {
-        rdd.foreach(record => println(record._2))
-      }
-    })
+    df.printSchema()
 
-    ssc.start()
-    ssc.awaitTermination()
   }
 }
