@@ -1,0 +1,8 @@
+[0m[[0m[0mdebug[0m] [0m[0mCreated transactional ClassFileManager with tempDir = /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Project/src/kafka-REST/target/scala-2.12/classes.bak[0m
+[0m[[0m[0mdebug[0m] [0m[0mAbout to delete class files:[0m
+[0m[[0m[0mdebug[0m] [0m[0mWe backup class files:[0m
+[0m[[0m[0mdebug[0m] [0m[0mRegistering generated classes:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Producer$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Producer$delayedInit$body.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Producer.class[0m
+[0m[[0m[0mdebug[0m] [0m[0mRemoving the temporary directory used for backing up class files: /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Project/src/kafka-REST/target/scala-2.12/classes.bak[0m
