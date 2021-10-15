@@ -38,3 +38,7 @@ Labs/Lab2/src/graphx/project/
 Labs/Lab2/src/graphx/.bsp/
 
 /home/emilstahl/Documents/Data-Intensive-Computing-ID2221/Project/target/
+Project/src/producer/target/maven-archiver/pom.properties
+Project/src/producer/target/analysis/compile
+Project/src/consumer/target/maven-archiver/pom.properties
+Project/src/consumer/target/analysis/compile
