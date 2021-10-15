@@ -1,0 +1,32 @@
+version: '3'
+services:
+  producer:
+    depends_on:
+      - kafka
+    build:
+      context: ./producer
+    ports:
+      - "9092:9092"
+    networks:
+      - wikiflow-network
+  kafka:
+    image: spotify/kafka
+    networks:
+      - wikiflow-network
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=consumer
+      - POSTGRES_DB=consumer
+      - POSTGRES_PASSWORD=goto@Postgres1
+    ports:
+      - "5432:5432"
+    networks:
+      - wikiflow-network
+networks:
+  wikiflow-network:
+    external:
+      name: wikiflow-network
+
+volumes:
+  delta:
