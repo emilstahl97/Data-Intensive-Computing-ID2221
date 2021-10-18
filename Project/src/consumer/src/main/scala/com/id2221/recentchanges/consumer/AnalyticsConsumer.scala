@@ -35,11 +35,10 @@ object AnalyticsConsumer extends App with LazyLogging {
     val value = inputStream.withColumn("value", col("value").cast(StringType))
 
 
-
   // please edit the code below
   val transformedStream: DataFrame = value
   
-  transformedStream.writeStream
+  transformedStream.toJSON.writeStream
     .outputMode("append")
     .format("console")
     .start()
