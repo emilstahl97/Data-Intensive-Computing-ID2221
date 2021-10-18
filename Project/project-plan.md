@@ -1,12 +1,12 @@
 ## Part 1 - Count chnges to wikipedia over time 
 
-* Retrieve dataset ✅
+* Retrieve dataset ✅ (done)
 
-* Set up kafka to read from streaming source ✅
+* Set up kafka to read from streaming source ✅ (done)
 
-* Set up spark streaming to print dataset to console ✅
+* Set up spark streaming to print dataset to console ✅ (done)
 
-* Convert columns from bytes to string ✅
+* Convert columns from bytes to string ✅ (done)
 
 * select value column
 
