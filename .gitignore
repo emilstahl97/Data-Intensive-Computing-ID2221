@@ -46,3 +46,7 @@ Project/src/consumer/target/analysis/compile
 Project/src/consumer/target/maven-archiver/pom.properties
 Project/src/producer/target/analysis/compile
 Project/src/producer/target/maven-archiver/pom.properties
+Project/src/consumer/target/analysis/compile
+Project/src/consumer/target/maven-archiver/pom.properties
+Project/src/producer/target/analysis/compile
+Project/src/producer/target/maven-archiver/pom.properties
