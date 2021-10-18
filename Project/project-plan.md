@@ -16,8 +16,6 @@
 
 * Save to database or kafka 
 
-
-
 (if time permits)
 * Use spark to create a time series graph of page views over time
 
