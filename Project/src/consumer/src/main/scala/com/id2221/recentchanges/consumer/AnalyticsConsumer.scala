@@ -2,6 +2,10 @@ package com.id2221.recentchanges.consumer
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.streaming.OutputMode.Complete
+import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerType, DoubleType};
+
 
 object AnalyticsConsumer extends App with LazyLogging {
 
@@ -25,11 +29,16 @@ object AnalyticsConsumer extends App with LazyLogging {
     .option("startingOffsets", "earliest")
     .load()
 
-    println("TEEEEEEEEST")
+    println("Consumer has started:")
+    
+    // convert the value column to string withColumn function
+    val value = inputStream.withColumn("value", col("value").cast(StringType))
+
+
 
   // please edit the code below
-  val transformedStream: DataFrame = inputStream
-
+  val transformedStream: DataFrame = value
+  
   transformedStream.writeStream
     .outputMode("append")
     .format("console")
