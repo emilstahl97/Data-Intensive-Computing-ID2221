@@ -25,7 +25,7 @@ object AnalyticsConsumer extends App with LazyLogging {
   val inputStream = spark.readStream
     .format("kafka")
     .option("kafka.bootstrap.servers", "kafka:9092")
-    .option("subscribe", "wikiflow-topic")
+    .option("subscribe", "wiki-recentchanges-topic")
     .option("startingOffsets", "earliest")
     .load()
 

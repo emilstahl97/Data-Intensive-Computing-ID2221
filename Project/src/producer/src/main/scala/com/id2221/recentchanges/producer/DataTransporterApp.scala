@@ -55,7 +55,7 @@ object DataTransporterApp extends App with StrictLogging {
   restartSource.runForeach(elem => {
     msgCounter += 1
 
-    val data = new ProducerRecord[String, String]("wikiflow-topic", elem.data)
+    val data = new ProducerRecord[String, String]("wiki-recentchanges-topic", elem.data)
     // print data to console
     println(data)
     producer.send(data)
