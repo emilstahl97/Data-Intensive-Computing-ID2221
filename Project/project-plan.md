@@ -1,16 +1,22 @@
-## Part 1 - Compare page views data over time
+## Part 1 - Count chnges to wikipedia over time 
 
-* Retrieve dataset
+* Retrieve dataset ✅
 
-* Set up kafka to read from dataset
+* Set up kafka to read from streaming source ✅
 
-* Use spark streaming to continuously read from kafka
+* Set up spark streaming to print dataset to console ✅
 
-* Analyze data with spark as in lab 1
+* Convert columns from bytes to string ✅
 
-* Write the results back to kafka
+* select value column
 
-* Store the results in a distributed database
+* Get name of artice, timestamp, and log_action_comment
+
+* Count number of articles changed per minute, per hour, per day, per week, per month, per year
+
+* Save to database or kafka 
+
+
 
 (if time permits)
 * Use spark to create a time series graph of page views over time
