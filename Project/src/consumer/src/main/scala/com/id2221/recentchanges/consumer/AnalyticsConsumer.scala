@@ -35,14 +35,11 @@ object AnalyticsConsumer extends App with LazyLogging {
     df = df.withColumn("value",col("value").cast(StringType)) 
 
     // Split by :
-    /*
+    
     val value = df.select(
       split(col("value"),",").getItem(13).as("Title"),
       split(col("value"),",").getItem(16).as("User"),
-      split(col("value"),",").getItem(17).as("isBot")
-    )
-    */
-    val value = df.select(
+      split(col("value"),",").getItem(17).as("isBot"),
       split(col("value"),",").getItem(4).as("time")
     )
 
