@@ -2,9 +2,10 @@ package com.id2221.recentchanges.consumer
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.col
-import org.apache.spark.sql.streaming.OutputMode.Complete
 import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerType, DoubleType};
+import org.apache.spark.sql.streaming.OutputMode.Complete
 
 
 object AnalyticsConsumer extends App with LazyLogging {
@@ -22,26 +23,32 @@ object AnalyticsConsumer extends App with LazyLogging {
   logger.info("Initializing Structured consumer")
 
 
-  val inputStream = spark.readStream
+  var df = spark.readStream
     .format("kafka")
     .option("kafka.bootstrap.servers", "kafka:9092")
-    .option("subscribe", "wiki-recentchanges-topic")
+    .option("subscribe", "wikiflow-topic")
     .option("startingOffsets", "earliest")
     .load()
 
-    println("Consumer has started:")
+    println("Started")
+
+    df = df.withColumn("value",col("value").cast(StringType)) 
+
+    // Split by :
     
-    // convert the value column to string withColumn function
-    val value = inputStream.withColumn("value", col("value").cast(StringType))
+    val value = df.select(
+      split(col("value"),",").getItem(13).as("Title"),
+      split(col("value"),",").getItem(16).as("User"),
+      split(col("value"),",").getItem(17).as("isBot"),
+      split(col("value"),",").getItem(4).as("time")
+    )
 
-
-  // please edit the code below
-  val transformedStream: DataFrame = value
-  
-  transformedStream.toJSON.writeStream
+  // print value to console
+  value.writeStream
     .outputMode("append")
     .format("console")
     .start()
+    .awaitTermination()
 
   spark.streams.awaitAnyTermination()
 }

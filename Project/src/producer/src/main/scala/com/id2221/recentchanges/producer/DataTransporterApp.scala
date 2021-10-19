@@ -52,12 +52,14 @@ object DataTransporterApp extends App with StrictLogging {
     }
   }
 
+  println("Starting to produce messages...")
+
   restartSource.runForeach(elem => {
     msgCounter += 1
 
     val data = new ProducerRecord[String, String]("wiki-recentchanges-topic", elem.data)
     // print data to console
-    println(data)
+    //println(data)
     producer.send(data)
 
     if (msgCounter % 100 == 0) {
