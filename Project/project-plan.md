@@ -8,11 +8,11 @@
 
 * Convert columns from bytes to string ✅
 
-* select value column
+* select value column ✅
 
-* Try to convert stream / dataframe to JSON
+* Try to convert stream / dataframe to JSON ✅
 
-* Get name of artice, timestamp, and log_action_comment
+* Get name of artice, timestamp, and log_action_comment ✅
 
 * Count number of articles changed per minute, per hour, per day, per week, per month, per year
 

@@ -4,7 +4,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.col
-import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerType, DoubleType};
+import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerType, DoubleType, BooleanType};
 import org.apache.spark.sql.streaming.OutputMode.Complete
 
 
@@ -30,21 +30,28 @@ object AnalyticsConsumer extends App with LazyLogging {
     .option("startingOffsets", "earliest")
     .load()
 
-    println("Started")
+  df = df.withColumn("value",col("value").cast(StringType)) 
 
-    df = df.withColumn("value",col("value").cast(StringType)) 
+  val schema = new StructType()
+        .add("title",StringType)
+        .add("user",StringType)
+        .add("bot",BooleanType)
+        .add("timestamp",IntegerType)
 
-    // Split by :
-    
-    val value = df.select(
-      split(col("value"),",").getItem(13).as("Title"),
-      split(col("value"),",").getItem(16).as("User"),
-      split(col("value"),",").getItem(17).as("isBot"),
-      split(col("value"),",").getItem(4).as("time")
-    )
+  val wikiDf = df.select(from_json(col("value"), schema).as("data"))
+   .select("data.*")
+
+  // TODO: Count changed articles per minutes
+  /*  Duration windowSize = Duration.ofSeconds(30);
+  TimeWindows tumblingWindow = TimeWindows.of(windowSize);
+
+  val countChanges = wikiDf
+    .groupBy(col("title"))
+    .windowedBy(tumblingWindow)
+    .count(); */
 
   // print value to console
-  value.writeStream
+  wikiDf.writeStream
     .outputMode("append")
     .format("console")
     .start()
