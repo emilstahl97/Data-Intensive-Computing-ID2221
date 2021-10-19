@@ -40,9 +40,15 @@ object AnalyticsConsumer extends App with LazyLogging {
       split(col("value"),",").getItem(13).as("Title")
     )
     */
+    /*
     val value = df.select(
       split(col("value"),",").getItem(16).as("User")
     )
+    */
+    val value = df.select(
+      split(col("value"),",").getItem(17).as("isBot")
+    )
+
 
 
   // print value to console
