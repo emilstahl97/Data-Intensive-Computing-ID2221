@@ -4,7 +4,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.col
-import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerType, DoubleType, BooleanType};
+import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerType, DoubleType, BooleanType, TimestampType};
 import org.apache.spark.sql.streaming.OutputMode.Complete
 
 
@@ -18,42 +18,50 @@ object AnalyticsConsumer extends App with LazyLogging {
     .config("spark.driver.memory", "5g")
     .master("local[2]")
     .getOrCreate()
+  
   spark.sparkContext.setLogLevel("WARN")
-
-  logger.info("Initializing Structured consumer")
-
   import spark.implicits._ 
 
-  var df = spark.readStream
-    .format("kafka")
-    .option("kafka.bootstrap.servers", "kafka:9092")
-    .option("subscribe", "wikiflow-topic")
-    .option("startingOffsets", "earliest")
-    .load()
+  val inputStream = spark
+       .readStream.format("kafka")
+       .option("kafka.bootstrap.servers", "kafka:9092")
+       .option("auto.offset.reset", "latest")
+       .option("value.deserializer", "StringDeserializer")
+       .option("subscribe", "wikiflow-topic")
+       .load
 
-  df = df.withColumn("value",col("value").cast(StringType)) 
+  val schema = StructType(
+       List(
+         StructField("title", StringType, true),
+         StructField("user", StringType, true),
+         StructField("bot", BooleanType, true),
+         StructField("timestamp", TimestampType, true),
+         StructField("id", IntegerType, true)
+       )
+     )
 
-  val schema = new StructType()
-        .add("title",StringType)
-        .add("user",StringType)
-        .add("bot",BooleanType)
-        .add("timestamp",StringType)
+  val initial = inputStream.selectExpr("CAST(value AS STRING)").toDF("value")
+  initial.printSchema()
 
-  var wikiDf = df.select(from_json(col("value"), schema).as("data"))
-   .select("data.*")
+  var aggregation = initial.select(from_json($"value", schema))
+  aggregation.printSchema()
 
-   // set batch window to 1 minute
-   var windowedCountsDF = wikiDf 
-    .groupBy(window($"timestamp","4 seconds"), $"title")
-	  .agg(avg("timestamp").alias("timestamp"))
-    
+  aggregation = initial.select(from_json($"value", schema).alias("tmp")).select("tmp.*")
+  aggregation.printSchema()
 
-  // print value to console
-  windowedCountsDF.writeStream
-    .outputMode("update")
-    .format("console")
-    .start()
-    .awaitTermination()
+  val windows = aggregation
+       .withWatermark("timestamp", "2 minutes")
+       .groupBy(window($"timestamp", "1 minute", "1 minute"), $"title")
 
-  spark.streams.awaitAnyTermination()
+  val aggregatedDF = windows.agg(sum("id"), count("*"))
+
+  val dfcount = aggregatedDF
+  .writeStream
+  .outputMode("complete")
+  .option("truncate", false)
+  .format("console")
+  .start()
+  
+  dfcount.awaitTermination()
+
 }
