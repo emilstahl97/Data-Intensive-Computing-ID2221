@@ -27,7 +27,7 @@ object AnalyticsConsumer extends App with LazyLogging {
        .option("kafka.bootstrap.servers", "kafka:9092")
        .option("auto.offset.reset", "latest")
        .option("value.deserializer", "StringDeserializer")
-       .option("subscribe", "shops_records")
+       .option("subscribe", "wikiflow-topic")
        .load
 
   val schema = StructType(
