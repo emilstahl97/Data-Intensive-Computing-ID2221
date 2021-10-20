@@ -22,6 +22,7 @@ object AnalyticsConsumer extends App with LazyLogging {
 
   logger.info("Initializing Structured consumer")
 
+  import spark.implicits._ 
 
   var df = spark.readStream
     .format("kafka")
@@ -36,23 +37,20 @@ object AnalyticsConsumer extends App with LazyLogging {
         .add("title",StringType)
         .add("user",StringType)
         .add("bot",BooleanType)
-        .add("timestamp",IntegerType)
+        .add("timestamp",StringType)
 
-  val wikiDf = df.select(from_json(col("value"), schema).as("data"))
+  var wikiDf = df.select(from_json(col("value"), schema).as("data"))
    .select("data.*")
 
-  // TODO: Count changed articles per minutes
-  /*  Duration windowSize = Duration.ofSeconds(30);
-  TimeWindows tumblingWindow = TimeWindows.of(windowSize);
-
-  val countChanges = wikiDf
-    .groupBy(col("title"))
-    .windowedBy(tumblingWindow)
-    .count(); */
+   // set batch window to 1 minute
+   var windowedCountsDF = wikiDf 
+    .groupBy(window($"timestamp","4 seconds"), $"title")
+	  .agg(avg("timestamp").alias("timestamp"))
+    
 
   // print value to console
-  wikiDf.writeStream
-    .outputMode("append")
+  windowedCountsDF.writeStream
+    .outputMode("update")
     .format("console")
     .start()
     .awaitTermination()
