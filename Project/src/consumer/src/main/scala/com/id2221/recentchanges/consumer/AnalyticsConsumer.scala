@@ -27,7 +27,7 @@ object AnalyticsConsumer extends App with LazyLogging {
        .option("kafka.bootstrap.servers", "kafka:9092")
        .option("auto.offset.reset", "latest")
        .option("value.deserializer", "StringDeserializer")
-       .option("subscribe", "shops_records")
+       .option("subscribe", "wikiflow-topic")
        .load
 
   val schema = StructType(
@@ -50,10 +50,10 @@ object AnalyticsConsumer extends App with LazyLogging {
   aggregation.printSchema()
 
   val windows = aggregation
-       .withWatermark("timestamp", "2 minutes")
-       .groupBy(window($"timestamp", "1 minute", "1 minute"), $"title")
+       .withWatermark("initial", "2 minutes")
+       .groupBy(window($"timestamp", "1 minute"), $"title")
 
-  val aggregatedDF = windows.agg(sum("id"), count("*"))
+ val aggregatedDF = windows.count()
 
   val dfcount = aggregatedDF
   .writeStream
