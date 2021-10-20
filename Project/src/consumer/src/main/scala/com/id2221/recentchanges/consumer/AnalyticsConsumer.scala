@@ -50,8 +50,8 @@ object AnalyticsConsumer extends App with LazyLogging {
   aggregation.printSchema()
 
   val windows = aggregation
-       .withWatermark("initial", "2 minutes")
-       .groupBy(window($"timestamp", "1 minute"), $"title")
+       .withWatermark("timestamp", "2 minutes")
+       .groupBy(window($"timestamp", "1 minute", "1 minute"), $"title")
 
  val aggregatedDF = windows.count()
 
