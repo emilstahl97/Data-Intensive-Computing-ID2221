@@ -50,14 +50,18 @@ object AnalyticsConsumer extends App with LazyLogging {
   aggregation.printSchema()
 
   // count the number of edits per user
-  val editsPerUser = aggregation.groupBy("user").count()
+  //val editsPerUser = aggregation.groupBy("user").count()
+
+    val windows = aggregation
+       .withWatermark("timestamp", "1 minutes")
+       .groupBy(window($"timestamp", "1 minute", "1 minute"), $"user", $"bot").count()
 
 /*
   val windows = aggregation
        .withWatermark("timestamp", "2 minutes")
        .groupBy(window($"timestamp", "1 minute", "1 minute"), $"title", $"window").count()
 */
-  val dfcount = editsPerUser
+  val dfcount = windows
   .writeStream
   .outputMode("complete")
   .option("truncate", false)
