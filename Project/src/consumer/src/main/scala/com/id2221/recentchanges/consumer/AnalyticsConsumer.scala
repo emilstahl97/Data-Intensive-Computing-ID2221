@@ -57,8 +57,8 @@ object AnalyticsConsumer extends App with LazyLogging {
        .groupBy(window($"timestamp", "1 minute", "1 minute"), $"user", $"bot").count()
 
   val numberOfArticles = aggregation
-       .withWatermark("timestamp", "2 minutes")
-       .groupBy(window($"timestamp", "1 minute", "1 minute"), $"title", $"window").count()
+       .withWatermark("timestamp", "1 minutes")
+       .groupBy(window($"timestamp", "1 minute", "1 minute"), $"window").count()
 
   val numberOfArticlesToConsole = numberOfArticles
   .writeStream
