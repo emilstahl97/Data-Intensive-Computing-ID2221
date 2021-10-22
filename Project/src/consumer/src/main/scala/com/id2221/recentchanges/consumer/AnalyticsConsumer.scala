@@ -6,7 +6,8 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerType, DoubleType, BooleanType, TimestampType};
 import org.apache.spark.sql.streaming.OutputMode.Complete
-
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
+import java.util.Properties
 
 object AnalyticsConsumer extends App with LazyLogging {
 
@@ -56,24 +57,38 @@ object AnalyticsConsumer extends App with LazyLogging {
        .withWatermark("timestamp", "1 minutes")
        .groupBy(window($"timestamp", "1 minute", "1 minute"), $"user", $"bot").count()
 
-  val numberOfArticles = aggregation
-       .withWatermark("timestamp", "1 minutes")
-       .groupBy(window($"timestamp", "1 minute", "1 minute"), $"window").count()
-
-  val numberOfArticlesToConsole = numberOfArticles
+  val changesPerUserToConsole = changesPerUser
   .writeStream
   .outputMode("complete")
   .option("truncate", false)
   .format("console")
   .start()  
 
+    val props = new Properties()
 
-  val changesPerUserToConsole = changesPerUser
-  .writeStream
-  .outputMode("complete")
-  .option("truncate", false)
-  .format("console")
-  .start()
+
+  props.put("bootstrap.servers", "kafka:9092")
+  props.put("client.id", "consumer")
+  props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+  props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+  props.put("acks", "all")
+  props.put("metadata.max.age.ms", "10000")
+
+  val producer = new KafkaProducer[String, String](props)
+
+  // write changesPerUser to kafka
+  val changesPerUserToKafka = changesPerUser
+    .writeStream
+    .outputMode("update")
+    .foreachBatch { (batchDF: DataFrame, batchId: Long) =>
+      batchDF.collect().foreach { row =>
+        val record = new ProducerRecord[String, String]("consumer-topic", row.toString())
+        producer.send(record)
+      }
+    }
+    .start()
+
+
   
 spark.streams.awaitAnyTermination()
 

@@ -10,6 +10,10 @@ services:
       - "4040:4040"
     volumes:
       - delta:/storage
+  kafka:
+    image: spotify/kafka
+    networks:
+      - wikiflow-network
 networks:
   wikiflow-network:
     external:
