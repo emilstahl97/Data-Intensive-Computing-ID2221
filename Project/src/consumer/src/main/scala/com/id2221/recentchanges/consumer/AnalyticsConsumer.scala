@@ -49,19 +49,32 @@ object AnalyticsConsumer extends App with LazyLogging {
   aggregation = initial.select(from_json($"value", schema).alias("tmp")).select("tmp.*")
   aggregation.printSchema()
 
-  val windows = aggregation
-       .withWatermark("timestamp", "2 minutes")
-       .groupBy(window($"timestamp", "1 minute", "1 minute"), $"title")
+  // count the number of edits per user
+  //val editsPerUser = aggregation.groupBy("user").count()
 
-  val aggregatedDF = windows.agg(sum("id"), count("*"))
+    val changesPerUser = aggregation
+       .withWatermark("timestamp", "1 minutes")
+       .groupBy(window($"timestamp", "1 minute", "1 minute"), $"user", $"bot").count()
 
-  val dfcount = aggregatedDF
+  val numberOfArticles = aggregation
+       .withWatermark("timestamp", "1 minutes")
+       .groupBy(window($"timestamp", "1 minute", "1 minute"), $"window").count()
+
+  val numberOfArticlesToConsole = numberOfArticles
+  .writeStream
+  .outputMode("complete")
+  .option("truncate", false)
+  .format("console")
+  .start()  
+
+
+  val changesPerUserToConsole = changesPerUser
   .writeStream
   .outputMode("complete")
   .option("truncate", false)
   .format("console")
   .start()
   
-  dfcount.awaitTermination()
+spark.streams.awaitAnyTermination()
 
 }
