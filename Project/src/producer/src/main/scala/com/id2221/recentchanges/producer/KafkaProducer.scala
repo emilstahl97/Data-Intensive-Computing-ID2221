@@ -15,7 +15,7 @@ import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 
 import scala.concurrent.duration._
 
-object DataTransporterApp extends App with StrictLogging {
+object KafkaProducer extends App with StrictLogging {
   logger.info("Initializing FlowProducer, sleeping for 30 seconds to let Kafka startup")
   Thread.sleep(300)
 
