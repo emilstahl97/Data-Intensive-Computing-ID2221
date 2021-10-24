@@ -66,7 +66,7 @@ object AnalyticsConsumer extends App with LazyLogging {
       sum(when($"bot" === true, lit(1))).as("is_bots"),
       sum(when($"bot" === false, lit(1))).as("non_bots")
     )
-/*
+
   val numberOfArticlesToConsole = numberOfArticles
     .writeStream
     .outputMode("complete")
@@ -87,7 +87,7 @@ object AnalyticsConsumer extends App with LazyLogging {
     .option("truncate", false)
     .format("console")
     .start()    
-    */
+  
 
   val writeNumberOfArticlesToKafka = new Kafka("number-of-articles", "number-of-articles")
   writeNumberOfArticlesToKafka.write(numberOfArticles, "articles")
@@ -121,7 +121,7 @@ class Kafka(topic: String, clientId: String) extends Serializable {
     .foreachBatch { (batchDF: DataFrame, batchId: Long) =>
       batchDF.collect().foreach { row =>
         val record = new ProducerRecord[String, String](topic, row.toString())
-        println("Writing stream " + topic + " to kafka")
+        //println("Writing stream " + topic + " to kafka")
         this.producer.send(record)
       }
     }
