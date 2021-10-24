@@ -1,3 +1,7 @@
+// Program for reading from wikimedia API recentchanges and using Akka to achieve high concurrency.¨
+// The GET request is written to a file and then read by the Akka actor system and finally written to Kafka.
+
+
 package com.id2221.recentchanges.producer
 
 import java.util.Properties
@@ -56,6 +60,8 @@ object KafkaProducer extends App with StrictLogging {
 
   restartSource.runForeach(elem => {
     msgCounter += 1
+
+    // Write to Kafka
 
     val data = new ProducerRecord[String, String]("wiki-recentchanges-topic", elem.data)
     // print data to console
