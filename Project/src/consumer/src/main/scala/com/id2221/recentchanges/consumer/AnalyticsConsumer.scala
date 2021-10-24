@@ -89,13 +89,13 @@ object AnalyticsConsumer extends App with LazyLogging {
     .start()    
     */
 
-  var writeNumberOfArticlesToKafka = new Kafka("number-of-articles", "number-of-articles")
+  val writeNumberOfArticlesToKafka = new Kafka("number-of-articles", "number-of-articles")
   writeNumberOfArticlesToKafka.write(numberOfArticles, "articles")
 
-  var writeChangesPerUserToKafka = new Kafka("users", "users")
+  val writeChangesPerUserToKafka = new Kafka("users", "users")
   writeChangesPerUserToKafka.write(changesPerUser, "users")
 
-  var writeBotCountToKafka = new Kafka("bots", "bots")
+  val writeBotCountToKafka = new Kafka("bots", "bots")
   writeBotCountToKafka.write(botsCount, "bots")
   
   spark.streams.awaitAnyTermination()
@@ -114,7 +114,6 @@ class Kafka(topic: String, clientId: String) extends Serializable {
   
   val producer = new KafkaProducer[String, String](props)
 
-
   def write(df: DataFrame, topic: String): Unit = {
     val stream = df
     .writeStream
@@ -129,5 +128,48 @@ class Kafka(topic: String, clientId: String) extends Serializable {
     .start()
   }
 }
+
+/*  // class for writing to HBase database
+
+  class HBase(tableName: String) extends Serializable {
+
+    val conf = HBaseConfiguration.create()
+    conf.set("hbase.zookeeper.quorum", "hbase")
+    conf.set("hbase.zookeeper.property.clientPort", "2181")
+    conf.set("hbase.defaults.for.version.skip", "true")
+    conf.set("hbase.rpc.timeout", "60000")
+    conf.set("hbase.client.scanner.timeout.period", "60000")
+    conf.set("hbase.client.operation.timeout", "60000")
+    conf.set("hbase.client.write.buffer", "10485760")
+    conf.set("hbase.client.retries.number", "3")
+    conf.set("hbase.client.pause", "20")
+    conf.set("hbase.client.connection.maxidletime", "60000")
+    conf.set("hbase.rpc.timeout", "60000")
+    conf.set("hbase.client.keyvalue.maxsize", "10485760")
+    conf.set("hbase.client.keyvalue.maxsize.checkfreq", "10485760")
+
+    val connection = ConnectionFactory.createConnection(conf)
+
+    val table = connection.getTable(TableName.valueOf(tableName))
+
+    def write(df: DataFrame, tableName: String): Unit = {
+      val stream = df
+      .writeStream
+      .outputMode("update")
+      .foreachBatch { (batchDF: DataFrame, batchId: Long) =>
+        batchDF.collect().foreach { row =>
+          val put = new Put(row.getAs[String]("key").getBytes())
+          put.addColumn("cf".getBytes(), "title".getBytes(), row.getAs[String]("title").getBytes())
+          put.addColumn("cf".getBytes(), "user".getBytes(), row.getAs[String]("user").getBytes())
+          put.addColumn("cf".getBytes(), "bot".getBytes(), row.getAs[Boolean]("bot").toString().getBytes())
+          put.addColumn("cf".getBytes(), "timestamp".getBytes(), row.getAs[String]("timestamp").getBytes())
+          put.addColumn("cf".getBytes(), "id".getBytes(), row.getAs[String]("id").getBytes())
+          table.put(put)
+        }
+      }
+      .start()
+    }
   
   }
+*/
+}
