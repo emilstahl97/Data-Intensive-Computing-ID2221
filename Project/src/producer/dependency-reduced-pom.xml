@@ -47,7 +47,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>com.id2221.recentchanges.producer.DataTransporterApp</mainClass>
+              <mainClass>com.id2221.recentchanges.producer.KafkaProducer</mainClass>
             </manifest>
           </archive>
         </configuration>

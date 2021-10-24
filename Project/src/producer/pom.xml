@@ -128,7 +128,7 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>com.id2221.recentchanges.producer.DataTransporterApp</Main-Class>
+                                        <Main-Class>com.id2221.recentchanges.producer.KafkaProducer</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
