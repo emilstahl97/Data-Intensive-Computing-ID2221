@@ -89,13 +89,19 @@ object AnalyticsConsumer extends App with LazyLogging {
     .start()    
     */
 
-  var kafka1 = new WriteToKafka("bots", "bots")
-  kafka1.write(botsCount, "bots")
+  var writeNumberOfArticlesToKafka = new Kafka("number-of-articles", "number-of-articles")
+  writeNumberOfArticlesToKafka.write(numberOfArticles, "articles")
+
+  var writeChangesPerUserToKafka = new Kafka("users", "users")
+  writeChangesPerUserToKafka.write(changesPerUser, "users")
+
+  var writeBotCountToKafka = new Kafka("bots", "bots")
+  writeBotCountToKafka.write(botsCount, "bots")
   
   spark.streams.awaitAnyTermination()
 
 
-class WriteToKafka(topic: String, clientId: String) extends Serializable {
+class Kafka(topic: String, clientId: String) extends Serializable {
 
   val props = new Properties()
 
@@ -116,7 +122,7 @@ class WriteToKafka(topic: String, clientId: String) extends Serializable {
     .foreachBatch { (batchDF: DataFrame, batchId: Long) =>
       batchDF.collect().foreach { row =>
         val record = new ProducerRecord[String, String](topic, row.toString())
-        println("Writing" + this.topic + " to kafka")
+        println("Writing stream " + topic + " to kafka")
         this.producer.send(record)
       }
     }
