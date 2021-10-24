@@ -61,33 +61,39 @@ object AnalyticsConsumer extends App with LazyLogging {
     .groupBy(window($"timestamp", "1 minute", "1 minute"), $"window").count()
 
   val botsCount = valueJson
+    .withWatermark("timestamp", "1 minutes")
     .groupBy(window($"timestamp", "1 minute", "1 minute"))
     .agg(
       sum(when($"bot" === true, lit(1))).as("is_bots"),
       sum(when($"bot" === false, lit(1))).as("non_bots")
     )
 
-  val numberOfArticlesToConsole = numberOfArticles
-    .writeStream
-    .outputMode("complete")
-    .option("truncate", false)
-    .format("console")
-    .start()  
+  val changePerID = valueJson
+    .withWatermark("timestamp", "1 minutes")
+    .groupBy(window($"timestamp", "10 minute"), $"id").count().sort()
 
-  val changesPerUserToConsole = changesPerUser
-    .writeStream
-    .outputMode("complete")
-    .option("truncate", false)
-    .format("console")
-    .start()
+  val botsPercentage = botsCount
+    .withColumn("bots_percentage", $"is_bots" / ($"is_bots" + $"non_bots"))
 
-  val botsCountToConsole = botsCount
-    .writeStream
-    .outputMode("complete")
-    .option("truncate", false)
-    .format("console")
-    .start()    
-  
+    writeToConsole(numberOfArticles)
+    writeToConsole(changesPerUser)
+    writeToConsole(botsCount) 
+    writeToConsole(changePerID)
+    writeToConsole(botsPercentage)
+
+
+    def writeToConsole(stream: DataFrame) : Unit = {
+      stream
+        .writeStream
+        .outputMode("complete")
+        .option("truncate", false)
+        .format("console")
+        .start()
+    }
+
+
+  // since multiple aggregations are not supported, we can write the aggregated stream to kafka and then do
+  // a second level of aggregation on the stream from kafka.
 
   val writeNumberOfArticlesToKafka = new Kafka("number-of-articles", "number-of-articles")
   writeNumberOfArticlesToKafka.write(numberOfArticles, "articles")
