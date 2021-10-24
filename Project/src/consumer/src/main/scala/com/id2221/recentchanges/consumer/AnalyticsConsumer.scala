@@ -39,18 +39,17 @@ object AnalyticsConsumer extends App with LazyLogging {
       StructField("id", IntegerType, true)
     )
   )
-
+  
   val value = inputStream.selectExpr("CAST(value AS STRING)").toDF("value")
   value.printSchema()
-
+  
   var valueJson = value.select(from_json($"value", schema))
   valueJson.printSchema()
-
+  
   valueJson = value.select(from_json($"value", schema).alias("tmp")).select("tmp.*")
   valueJson.printSchema()
 
-  // count the number of edits per user
-  //val editsPerUser = valueJson.groupBy("user").count()
+  println("Starting consumer...")
 
   val changesPerUser = valueJson
     .withWatermark("timestamp", "1 minutes")
